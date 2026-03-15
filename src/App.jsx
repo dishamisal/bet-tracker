@@ -71,40 +71,22 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <button
-          className="add-bet-btn"
-          onClick={() => { setEditBet(null); setShowForm(true); }}
-        >
-          <span>+</span> New Bet
+        <button className="add-bet-btn" onClick={() => { setEditBet(null); setShowForm(true); }}>
+          <span>+</span> <span className="add-bet-btn-text">New Bet</span>
         </button>
       </aside>
 
       <main className="main-content">
         <div className="page-wrap">
-          {page === "dashboard" && (
-            <Dashboard
-              bets={bets}
-              onNewBet={() => { setEditBet(null); setShowForm(true); }}
-            />
-          )}
-          {page === "bets" && (
-            <BetList
-              bets={bets}
-              onEdit={openEdit}
-              onDelete={deleteBet}
-              onNewBet={() => { setEditBet(null); setShowForm(true); }}
-            />
-          )}
+          {page === "dashboard" && <Dashboard bets={bets} onNewBet={() => { setEditBet(null); setShowForm(true); }} />}
+          {page === "bets" && <BetList bets={bets} onEdit={openEdit} onDelete={deleteBet} onNewBet={() => { setEditBet(null); setShowForm(true); }} />}
           {page === "charts" && <Charts bets={bets} />}
           {page === "leaderboard" && <Leaderboard bets={bets} />}
         </div>
       </main>
 
       {showForm && (
-        <div
-          className="modal-overlay"
-          onClick={(e) => e.target === e.currentTarget && setShowForm(false)}
-        >
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
           <BetForm
             initial={editBet}
             onSave={editBet ? updateBet : addBet}
