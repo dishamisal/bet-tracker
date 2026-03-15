@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { db } from "./firebase";
 import Dashboard from "./components/Dashboard";
 import BetList from "./components/BetList";
 import BetForm from "./components/BetForm";
@@ -15,36 +17,38 @@ const NAV = [
 
 export default function App() {
   const [page, setPage] = useState("dashboard");
-  const [bets, setBets] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("bets") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [bets, setBets] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editBet, setEditBet] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("bets", JSON.stringify(bets));
-  }, [bets]);
+    const unsub = onSnapshot(collection(db, "bets"), (snapshot) => {
+      const data = snapshot.docs.map(d => ({ ...d.data(), id: d.id }));
+      data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setBets(data);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
 
-  const addBet = (bet) => {
-    setBets((prev) => [
-      ...prev,
-      { ...bet, id: Date.now(), createdAt: new Date().toISOString() },
-    ]);
+  const addBet = async (bet) => {
+    await addDoc(collection(db, "bets"), {
+      ...bet,
+      createdAt: new Date().toISOString(),
+    });
     setShowForm(false);
   };
 
-  const updateBet = (updated) => {
-    setBets((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+  const updateBet = async (updated) => {
+    const { id, ...data } = updated;
+    await updateDoc(doc(db, "bets", id), data);
     setEditBet(null);
     setShowForm(false);
   };
 
-  const deleteBet = (id) => {
-    setBets((prev) => prev.filter((b) => b.id !== id));
+  const deleteBet = async (id) => {
+    await deleteDoc(doc(db, "bets", id));
   };
 
   const openEdit = (bet) => {
@@ -78,10 +82,19 @@ export default function App() {
 
       <main className="main-content">
         <div className="page-wrap">
-          {page === "dashboard" && <Dashboard bets={bets} onNewBet={() => { setEditBet(null); setShowForm(true); }} />}
-          {page === "bets" && <BetList bets={bets} onEdit={openEdit} onDelete={deleteBet} onNewBet={() => { setEditBet(null); setShowForm(true); }} />}
-          {page === "charts" && <Charts bets={bets} />}
-          {page === "leaderboard" && <Leaderboard bets={bets} />}
+          {loading ? (
+            <div className="empty-state">
+              <div className="empty-icon">⏳</div>
+              <div className="empty-text">Loading bets...</div>
+            </div>
+          ) : (
+            <>
+              {page === "dashboard" && <Dashboard bets={bets} onNewBet={() => { setEditBet(null); setShowForm(true); }} />}
+              {page === "bets" && <BetList bets={bets} onEdit={openEdit} onDelete={deleteBet} onNewBet={() => { setEditBet(null); setShowForm(true); }} />}
+              {page === "charts" && <Charts bets={bets} />}
+              {page === "leaderboard" && <Leaderboard bets={bets} />}
+            </>
+          )}
         </div>
       </main>
 
