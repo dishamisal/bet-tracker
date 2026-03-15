@@ -54,7 +54,7 @@ export default function BetList({ bets, onEdit, onDelete, onNewBet }) {
           <div className="bet-table-header">
             <span>Description</span>
             <span>Opponent</span>
-            <span>Amount</span>
+            <span>Stakes</span>
             <span>Outcome</span>
             <span></span>
           </div>
@@ -78,7 +78,16 @@ function BetRow({ bet, onEdit, onDelete }) {
         {bet.notes && <div style={{ fontSize: "0.78rem", color: "var(--muted2)", marginTop: 3 }}>{bet.notes}</div>}
       </div>
       <div className="bet-opponent">{bet.opponent || "—"}</div>
-      <div className="bet-amount">₹{parseFloat(bet.amount || 0).toFixed(2)}</div>
+      <div style={{ fontSize: "0.82rem" }}>
+        <div style={{ color: "var(--red)", marginBottom: 3 }}>
+          <span style={{ color: "var(--muted)", fontSize: "0.72rem" }}>You give: </span>
+          {bet.myStake || bet.amount ? (bet.myStake || `₹${parseFloat(bet.amount).toFixed(2)}`) : "—"}
+        </div>
+        <div style={{ color: "var(--green)" }}>
+          <span style={{ color: "var(--muted)", fontSize: "0.72rem" }}>You get: </span>
+          {bet.theirStake || "—"}
+        </div>
+      </div>
       <div>
         <span className={`badge badge-${bet.outcome}`}>
           {bet.outcome === "win" ? "✓ Won" : bet.outcome === "loss" ? "✗ Lost" : "⏳ Pending"}

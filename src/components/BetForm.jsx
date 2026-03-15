@@ -3,7 +3,8 @@ import { useState } from "react";
 const empty = {
   description: "",
   opponent: "",
-  amount: "",
+  myStake: "",
+  theirStake: "",
   outcome: "pending",
   notes: "",
 };
@@ -15,9 +16,9 @@ export default function BetForm({ initial, onSave, onCancel }) {
 
   const handleSave = () => {
     if (!form.description.trim()) return alert("Please enter a description.");
-    if (!form.amount || isNaN(form.amount) || parseFloat(form.amount) <= 0)
-      return alert("Please enter a valid amount.");
-    onSave({ ...form, amount: parseFloat(form.amount) });
+    if (!form.myStake.trim()) return alert("Please enter what you're putting up.");
+    if (!form.theirStake.trim()) return alert("Please enter what your opponent is putting up.");
+    onSave({ ...form });
   };
 
   return (
@@ -44,15 +45,25 @@ export default function BetForm({ initial, onSave, onCancel }) {
             onChange={(e) => set("opponent", e.target.value)}
           />
         </div>
+      </div>
+
+      <div className="form-row">
         <div className="form-group">
-          <label className="form-label">Amount (₹)</label>
+          <label className="form-label">If you lose, you give...</label>
           <input
             className="form-input"
-            type="number"
-            min="0"
-            placeholder="e.g. 100"
-            value={form.amount}
-            onChange={(e) => set("amount", e.target.value)}
+            placeholder="e.g. Lunch from their fav place"
+            value={form.myStake}
+            onChange={(e) => set("myStake", e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label className="form-label">If you win, you get...</label>
+          <input
+            className="form-input"
+            placeholder="e.g. 1hr board game time"
+            value={form.theirStake}
+            onChange={(e) => set("theirStake", e.target.value)}
           />
         </div>
       </div>
