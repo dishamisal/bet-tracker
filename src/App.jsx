@@ -89,8 +89,8 @@ export default function App() {
             </div>
           ) : (
             <>
-              {page === "dashboard" && <Dashboard bets={bets} onNewBet={() => { setEditBet(null); setShowForm(true); }} />}
-              {page === "bets" && <BetList bets={bets} onEdit={openEdit} onDelete={deleteBet} onNewBet={() => { setEditBet(null); setShowForm(true); }} />}
+              {page === "dashboard" && <Dashboard bets={bets} />}
+              {page === "bets" && <BetList bets={bets} onEdit={openEdit} onDelete={deleteBet} />}
               {page === "charts" && <Charts bets={bets} />}
               {page === "leaderboard" && <Leaderboard bets={bets} />}
             </>

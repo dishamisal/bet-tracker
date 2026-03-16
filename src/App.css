@@ -538,6 +538,18 @@ body {
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
+/* ── BetList toolbar ── */
+.betlist-toolbar-desktop {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.betlist-toolbar-mobile { display: none; }
+.bet-mobile-row { display: none; }
+.bet-col-desktop { display: block; }
+
 /* ── Mobile Responsive ── */
 @media (max-width: 768px) {
   /* Hide sidebar, show bottom nav instead */
@@ -656,4 +668,41 @@ body {
 
   /* Page title smaller */
   .page-title { font-size: 1.8rem; }
+
+  /* Toolbar */
+  .betlist-toolbar-desktop { display: none; }
+  .betlist-toolbar-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  /* Bet rows */
+  .bet-col-desktop { display: none; }
+  .bet-mobile-row { display: block; }
+
+  .bet-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    position: relative;
+    padding-right: 80px;
+  }
+
+  .bet-actions {
+    position: absolute;
+    top: 14px;
+    right: 12px;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Prevent overflow */
+  .app { overflow-x: hidden; }
+  .bet-table { overflow-x: hidden; width: 100%; }
+  .page-wrap { overflow-x: hidden; width: 100%; }
+  .recharts-wrapper { width: 100% !important; }
+  .recharts-surface { width: 100% !important; }
 }

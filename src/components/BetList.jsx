@@ -22,7 +22,8 @@ export default function BetList({ bets, onEdit, onDelete, onNewBet }) {
         <div className="page-sub">{bets.length} total bets recorded</div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px", marginBottom: "20px", alignItems: "center" }}>
+      {/* Desktop toolbar */}
+      <div className="betlist-toolbar-desktop">
         <input
           className="form-input"
           style={{ maxWidth: 260, marginBottom: 0 }}
@@ -41,7 +42,28 @@ export default function BetList({ bets, onEdit, onDelete, onNewBet }) {
             </button>
           ))}
         </div>
-        <button className="primary-btn" style={{ marginLeft: "auto" }} onClick={onNewBet}>+ New Bet</button>
+      </div>
+
+      {/* Mobile toolbar */}
+      <div className="betlist-toolbar-mobile">
+        <input
+          className="form-input"
+          placeholder="Search bets..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <div className="filter-bar" style={{ margin: 0, flexWrap: "nowrap", overflowX: "auto", paddingBottom: 4 }}>
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              className={`filter-btn ${filter === f ? "active" : ""}`}
+              onClick={() => setFilter(f)}
+              style={{ flexShrink: 0 }}
+            >
+              {f === "all" ? "All" : f === "win" ? "✓ Wins" : f === "loss" ? "✗ Losses" : "⏳ Pending"}
+            </button>
+          ))}
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -77,22 +99,47 @@ function BetRow({ bet, onEdit, onDelete }) {
         <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: 2 }}>{date}</div>
         {bet.notes && <div style={{ fontSize: "0.78rem", color: "var(--muted2)", marginTop: 3 }}>{bet.notes}</div>}
       </div>
-      <div className="bet-opponent">{bet.opponent || "—"}</div>
-      <div style={{ fontSize: "0.82rem" }}>
-        <div style={{ color: "var(--red)", marginBottom: 3 }}>
+      <div className="bet-opponent bet-col-desktop">{bet.opponent || "—"}</div>
+      <div className="bet-col-desktop" style={{ fontSize: "0.82rem" }}>
+        <div style={{ color: "var(--loss)", marginBottom: 3 }}>
           <span style={{ color: "var(--muted)", fontSize: "0.72rem" }}>You give: </span>
           {bet.myStake || bet.amount ? (bet.myStake || `₹${parseFloat(bet.amount).toFixed(2)}`) : "—"}
         </div>
-        <div style={{ color: "var(--green)" }}>
+        <div style={{ color: "var(--win)" }}>
           <span style={{ color: "var(--muted)", fontSize: "0.72rem" }}>You get: </span>
           {bet.theirStake || "—"}
         </div>
       </div>
-      <div>
+      <div className="bet-col-desktop">
         <span className={`badge badge-${bet.outcome}`}>
           {bet.outcome === "win" ? "✓ Won" : bet.outcome === "loss" ? "✗ Lost" : "⏳ Pending"}
         </span>
       </div>
+
+      {/* Mobile only info */}
+      <div className="bet-mobile-row">
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          {bet.opponent && <span style={{ color: "var(--muted2)", fontSize: "0.8rem" }}>vs {bet.opponent}</span>}
+          <span className={`badge badge-${bet.outcome}`}>
+            {bet.outcome === "win" ? "✓ Won" : bet.outcome === "loss" ? "✗ Lost" : "⏳ Pending"}
+          </span>
+        </div>
+        <div style={{ fontSize: "0.8rem", marginTop: 6, display: "flex", gap: 16 }}>
+          {(bet.myStake || bet.amount) && (
+            <span>
+              <span style={{ color: "var(--muted)", fontSize: "0.72rem" }}>Give: </span>
+              <span style={{ color: "var(--loss)" }}>{bet.myStake || `₹${parseFloat(bet.amount).toFixed(2)}`}</span>
+            </span>
+          )}
+          {bet.theirStake && (
+            <span>
+              <span style={{ color: "var(--muted)", fontSize: "0.72rem" }}>Get: </span>
+              <span style={{ color: "var(--win)" }}>{bet.theirStake}</span>
+            </span>
+          )}
+        </div>
+      </div>
+
       <div className="bet-actions">
         <button className="icon-btn" title="Edit" onClick={() => onEdit(bet)}>✏️</button>
         <button className="icon-btn del" title="Delete" onClick={() => {

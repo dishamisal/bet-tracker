@@ -1,22 +1,10 @@
-export default function Dashboard({ bets, onNewBet }) {
+export default function Dashboard({ bets }) {
   const total = bets.length;
   const wins = bets.filter((b) => b.outcome === "win").length;
   const losses = bets.filter((b) => b.outcome === "loss").length;
   const pending = bets.filter((b) => b.outcome === "pending").length;
-
-  const profit = bets.reduce((acc, b) => {
-    if (b.outcome === "win") return acc + parseFloat(b.amount || 0);
-    if (b.outcome === "loss") return acc - parseFloat(b.amount || 0);
-    return acc;
-  }, 0);
-
-  const winRate = total > 0 ? Math.round(((wins) / (wins + losses || 1)) * 100) : 0;
+  const winRate = total > 0 ? Math.round((wins / (wins + losses || 1)) * 100) : 0;
   const recent = [...bets].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
-
-  const fmt = (n) => {
-    const abs = Math.abs(n).toFixed(2);
-    return (n >= 0 ? "+" : "-") + "₹" + abs;
-  };
 
   return (
     <div>
@@ -42,11 +30,9 @@ export default function Dashboard({ bets, onNewBet }) {
           <div className="stat-sub">vs {wins} wins</div>
         </div>
         <div className="stat-card blue">
-          <div className="stat-label">Net Profit</div>
-          <div className="stat-value" style={{ fontSize: "1.5rem", color: profit >= 0 ? "var(--win)" : "var(--loss)" }}>
-            {fmt(profit)}
-          </div>
-          <div className="stat-sub">across all settled bets</div>
+          <div className="stat-label">Pending</div>
+          <div className="stat-value">{pending}</div>
+          <div className="stat-sub">awaiting outcome</div>
         </div>
       </div>
 
@@ -57,15 +43,14 @@ export default function Dashboard({ bets, onNewBet }) {
       {recent.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">🎯</div>
-          <div className="empty-text">No bets yet. Add your first one!</div>
-          <button className="primary-btn" onClick={onNewBet}>+ New Bet</button>
+          <div className="empty-text">No bets yet. Add your first one from the sidebar!</div>
         </div>
       ) : (
         <div className="bet-table">
           <div className="bet-table-header">
             <span>Description</span>
             <span>Opponent</span>
-            <span>Amount</span>
+            <span>Stakes</span>
             <span>Outcome</span>
             <span></span>
           </div>
@@ -86,12 +71,29 @@ function BetRowSimple({ bet }) {
         <div className="bet-desc">{bet.description}</div>
         <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: 2 }}>{date}</div>
       </div>
-      <div className="bet-opponent">{bet.opponent || "—"}</div>
-      <div className="bet-amount">₹{parseFloat(bet.amount || 0).toFixed(2)}</div>
-      <div>
+      <div className="bet-opponent bet-col-desktop">{bet.opponent || "—"}</div>
+      <div className="bet-col-desktop" style={{ fontSize: "0.82rem" }}>
+        <div style={{ color: "var(--loss)", marginBottom: 3 }}>
+          <span style={{ color: "var(--muted)", fontSize: "0.72rem" }}>Give: </span>
+          {bet.myStake || (bet.amount ? `₹${parseFloat(bet.amount).toFixed(2)}` : "—")}
+        </div>
+        <div style={{ color: "var(--win)" }}>
+          <span style={{ color: "var(--muted)", fontSize: "0.72rem" }}>Get: </span>
+          {bet.theirStake || "—"}
+        </div>
+      </div>
+      <div className="bet-col-desktop">
         <span className={`badge badge-${bet.outcome}`}>
           {bet.outcome === "win" ? "✓ Won" : bet.outcome === "loss" ? "✗ Lost" : "⏳ Pending"}
         </span>
+      </div>
+      <div className="bet-mobile-row">
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {bet.opponent && <span style={{ color: "var(--muted2)", fontSize: "0.8rem" }}>vs {bet.opponent}</span>}
+          <span className={`badge badge-${bet.outcome}`}>
+            {bet.outcome === "win" ? "✓ Won" : bet.outcome === "loss" ? "✗ Lost" : "⏳ Pending"}
+          </span>
+        </div>
       </div>
       <div></div>
     </div>
